@@ -1,0 +1,10 @@
+Goals
+    1. display a wireframe mesh
+        1.1. Load a mesh from an .obj file
+
+Notes
+
+    1. Assumptions about the .obj files
+        1.1. Only one mesh included
+        1.2. "vn" and "vt" are ignored
+        1.3. materials are ignored
