@@ -1,0 +1,3 @@
+Goals
+    1. Create a camera that moves freely in space using the keyboard only
+    2. Add mouse controls

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.1">
+  <zoom_level>11</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>671</x>
+      <y>198</y>
+      <w>209</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Application
+--
+--
++RegisterEventHandler()
++RegisterRenderer()
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>374</x>
+      <y>44</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+IEventHandler
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>363</x>
+      <y>198</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+CameraController</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>363</x>
+      <y>440</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Camera
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>396</x>
+      <y>44</y>
+      <w>54</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+</panel_attributes>
+    <additional_attributes>33;33;33;154</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>352</x>
+      <y>198</y>
+      <w>152</w>
+      <h>263</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+manipulates
+m1=1
+m2=1</panel_attributes>
+    <additional_attributes>77;33;77;242</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>462</x>
+      <y>0</y>
+      <w>370</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+&lt;notifies
+m1=*
+</panel_attributes>
+    <additional_attributes>33;55;308;55;308;198</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>374</x>
+      <y>616</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+IRenderer
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>396</x>
+      <y>561</y>
+      <w>54</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+m1=    *
+</panel_attributes>
+    <additional_attributes>33;55;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>363</x>
+      <y>539</y>
+      <w>176</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>bt=*
+ICameraObserver
+bg=yellow
+--
+--
++OnCameraUpdate()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>473</x>
+      <y>165</y>
+      <w>219</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.&lt;
+uses</panel_attributes>
+    <additional_attributes>198;55;33;55</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>363</x>
+      <y>440</y>
+      <w>128</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;1-
+m1=  *
+notifies&gt;</panel_attributes>
+    <additional_attributes>66;99;66;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>198</x>
+      <y>429</y>
+      <w>186</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1
+m2=  1
+</panel_attributes>
+    <additional_attributes>165;33;33;33;33;132;165;132</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>374</x>
+      <y>704</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Renderer</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>396</x>
+      <y>616</y>
+      <w>54</w>
+      <h>109</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+
+</panel_attributes>
+    <additional_attributes>33;88;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>462</x>
+      <y>242</y>
+      <w>329</w>
+      <h>406</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+bg=yellow</panel_attributes>
+    <additional_attributes>33;385;308;385;308;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>22</x>
+      <y>297</y>
+      <w>154</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Object
+--
+--
++Update()
++IsActive():bool
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>55</x>
+      <y>22</y>
+      <w>340</w>
+      <h>296</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;</panel_attributes>
+    <additional_attributes>319;33;33;33;33;275</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>55</x>
+      <y>352</y>
+      <w>329</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;</panel_attributes>
+    <additional_attributes>308;231;33;231;33;33</additional_attributes>
+  </element>
+</diagram>
