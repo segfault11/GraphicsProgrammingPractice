@@ -127,7 +127,11 @@
     void main()
     {
         float alpha = texture(Atlas, VertexIn.TexCoord).r;
-        vec3 textColor = alpha*TextColor;
+        vec3 textColor = vec3(
+                alpha*TextColor.x, 
+                alpha*TextColor.y, 
+                alpha*TextColor.z
+            );
 
         FragOut = vec4(textColor, alpha);
     }

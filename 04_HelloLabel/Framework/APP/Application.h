@@ -43,6 +43,7 @@ namespace APP
     void Run();
 
     void RegisterRenderer(IRenderer& renderer);
+    void RegisterGUIRenderer(IRenderer& renderer);
     void RegisterEventHandler(IEventHandler& eventHandler);
 
     unsigned int GetScreenWidth();

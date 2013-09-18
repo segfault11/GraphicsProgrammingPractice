@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------
 APP::GUIRenderer::GUIRenderer(const TextureAtlas& atlas)
 :
-    atlas_(&atlas), posBuffer_(NULL), texBuffer_(NULL)
+    atlas_(&atlas)
 {
     // CREATE PROGRAM ...
     program_.AttachShaderFromSource(VertexShader, GL_VERTEX_SHADER);
@@ -22,29 +22,29 @@ APP::GUIRenderer::GUIRenderer(const TextureAtlas& atlas)
     program_.SetInt("AtlasHeight", atlas_->GetHeight());
     program_.SetInt("AtlasWidth", atlas_->GetWidth());
     program_.SetInt("Atlas", 1);
-
-    // CREATE VERTEX ARRAY  
-    vertexArray_ = new GL::VertexArray();
 }
 //------------------------------------------------------------------------------
 APP::GUIRenderer::~GUIRenderer()
 {
-    if (posBuffer_ != NULL)
+    std::list<GUIElementInfo>::iterator i = guiElements_.begin();
+    std::list<GUIElementInfo>::iterator end = guiElements_.end();
+
+    for (; i != end; i++)
     {
-        delete posBuffer_;
+        delete (*i).VertexArray;
+        delete (*i).BufferObject;
     }
-
-    if (texBuffer_ != NULL)
-    {
-        delete texBuffer_;
-    }    
-
-    delete vertexArray_;
 }
 //------------------------------------------------------------------------------
 void APP::GUIRenderer::RegisterGUIElement(const GUIElement& ele)
 {
-    element_ = &ele;
+    // CREATE A VERTEX OBJ AND BUFFER OBJECT FOR THE GUI ELEMENT AND SAVE 
+    // IT WITH THEM TO A LIST.
+
+    GUIElementInfo eleInfo;
+
+    eleInfo.VertexArray = new GL::VertexArray();
+    eleInfo.GUIElement = &ele;
 
     // CREATE BUFFER OBJECT FOR THE GUI ELEMENT ...
     std::string text = ele.GetText();  
@@ -65,23 +65,41 @@ void APP::GUIRenderer::RegisterGUIElement(const GUIElement& ele)
         posY += atlas_->GetAdvance(c).GetY();
     }
 
-    posBuffer_ = new GL::BufferObject(GL_ARRAY_BUFFER, size, GL_STATIC_DRAW);
-    posBuffer_->SetData(size, glyphData);
+    eleInfo.BufferObject = new GL::BufferObject(
+            GL_ARRAY_BUFFER, 
+            size, 
+            GL_STATIC_DRAW
+        );
+    eleInfo.BufferObject->SetData(size, glyphData);
 
     // ... AND ATTACH IT TO THE VERTEX ARRAY
-    vertexArray_->SetAttribute(posBuffer_, 0, 4, GL_INT, GL_FALSE, 0, 0);
+    eleInfo.VertexArray->SetAttribute(
+        eleInfo.BufferObject, 
+        0, 4, GL_INT, GL_FALSE, 
+        0, 0
+    );
 
     delete[] glyphData;
 
-    // ... SET TEXT COLOR
-    program_.SetVec3("TextColor", ele.GetTextColor());
+    // SAVE ELEMENT INFO TO LIST
+    guiElements_.push_back(eleInfo);
+
 }
 //------------------------------------------------------------------------------
 void APP::GUIRenderer::Render()
 {
     program_.Bind();
-    vertexArray_->Bind();
     atlas_->Bind(1);
-    glDrawArrays(GL_POINTS, 0, element_->GetText().size());
+
+    std::list<GUIElementInfo>::iterator i = guiElements_.begin();
+    std::list<GUIElementInfo>::iterator end = guiElements_.end();
+
+    for (; i != end; i++)
+    {
+        program_.SetVec3("TextColor", (*i).GUIElement->GetTextColor());
+        (*i).VertexArray->Bind();
+        glDrawArrays(GL_POINTS, 0, (*i).GUIElement->GetText().size());
+    }
+
 }
 //------------------------------------------------------------------------------

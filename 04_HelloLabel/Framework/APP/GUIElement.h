@@ -25,6 +25,7 @@ namespace APP
         GUIElement(const std::string& text, const Math::Vector2I& pos);
         ~GUIElement();
 
+        void SetTextColor(const Math::Vector3F& color) {textColor_ = color;}
 
         const Math::Vector3F& GetTextColor() const {return textColor_;}
         const Math::Vector2I& GetPosition() const {return position_;}

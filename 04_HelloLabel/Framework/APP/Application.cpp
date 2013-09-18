@@ -9,6 +9,7 @@ static SDL_GLContext context_ = NULL;
 static float elapsed_ = 0.0f;
 static std::list<APP::IEventHandler*> eventHandlers_;
 static std::list<APP::IRenderer*> renderer_;
+static std::list<APP::IRenderer*> guiRenderer_;
 static std::list<APP::IObject*> objects_;
 
 static unsigned int screenWidth_;
@@ -133,16 +134,28 @@ void APP::Run()
             }    
         }
 
-        
-        //  draw
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //  draw gui renderer
         {
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
             std::list<IRenderer*>::iterator start = renderer_.begin();
             std::list<IRenderer*>::iterator end = renderer_.end();
+
+            for (; start != end; start++)
+            {
+                (*start)->Render();
+            }
+
+        }
+
+        
+        //  draw gui renderer
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        {        
+            std::list<IRenderer*>::iterator start = guiRenderer_.begin();
+            std::list<IRenderer*>::iterator end = guiRenderer_.end();
 
             for (; start != end; start++)
             {
@@ -175,6 +188,12 @@ void APP::Run()
 void APP::RegisterRenderer(IRenderer& renderer)
 {
     renderer_.push_back(&renderer);
+    objects_.push_back(&renderer);
+}
+//------------------------------------------------------------------------------
+void APP::RegisterGUIRenderer(IRenderer& renderer)
+{
+    guiRenderer_.push_back(&renderer);
     objects_.push_back(&renderer);
 }
 //------------------------------------------------------------------------------

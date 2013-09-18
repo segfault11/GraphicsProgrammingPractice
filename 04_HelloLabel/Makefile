@@ -3,7 +3,7 @@ FLAGS = -Wall
 LIBS = -lGLEW libFramework.a -lfreetype libSOIL.a
 FRAMEWORKS = -framework OpenGL -framework SDL2 -framework CoreFoundation
 TARGET = HelloLabel
-OBJ = TextRenderer.o
+OBJ = 
 
 .PHONY:
 $(TARGET): Main.cpp $(OBJ)

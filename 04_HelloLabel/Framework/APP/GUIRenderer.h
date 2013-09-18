@@ -12,11 +12,23 @@
 #include "TextureAtlas.h" 
 #include "IRenderer.h"
 #include "GUIElement.h"
+#include <list>
 
 namespace APP 
 {
     class GUIRenderer : public IRenderer
     {
+        /*
+        ** Saves references to a gui element and its array and vertex buffer.
+        */
+        class GUIElementInfo
+        {
+        public:
+            GL::VertexArray* VertexArray;
+            GL::BufferObject* BufferObject;
+            const APP::GUIElement* GUIElement;
+        };
+
     public:
         GUIRenderer(const TextureAtlas& atlas);
         ~GUIRenderer();
@@ -28,12 +40,11 @@ namespace APP
     private:
         DECL_DEFAULTS(GUIRenderer)
 
+        std::list<GUIElementInfo> guiElements_;
+
         const TextureAtlas* atlas_;
         const GUIElement* element_;
         GL::Program program_;
-        GL::VertexArray* vertexArray_;
-        GL::BufferObject* posBuffer_;
-        GL::BufferObject* texBuffer_;  
     };
     
 }
