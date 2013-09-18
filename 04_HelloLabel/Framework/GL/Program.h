@@ -29,6 +29,7 @@ namespace GL
         void SetMat4(const char* name, const GLfloat* data);
         void SetInt(const char* name, GLint i);
         void SetIVec2(const char* name, const GLint* ivec);
+        void SetVec3(const char* name, const GLfloat* vec);
 
         void Compile();
         void Bind() const;

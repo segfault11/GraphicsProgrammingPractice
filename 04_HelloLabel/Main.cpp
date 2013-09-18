@@ -11,7 +11,7 @@
 int main(int argc, char const *argv[])
 {
     APP::Init("HelloLabel", 0, 0, 600, 600);
-    APP::TextureAtlas atlas("Inconsolata.otf", 20);
+    APP::TextureAtlas atlas("Inconsolata.otf", 12);
     APP::GUIRenderer renderer(atlas);
     APP::GUIElement element("Hallo, Welt", Math::Vector2I(50, 50));
     renderer.RegisterGUIElement(element);

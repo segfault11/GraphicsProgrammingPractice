@@ -1,5 +1,5 @@
 /*!
-** Implementation of the shaders used by the GUI
+** Implementation of the shaders used by the [GUIRenderer]
 **    
 ** @since 2013-09-16 
 */
@@ -12,18 +12,17 @@
     const char* VertexShader = 
     "#version 150\n"
     TO_STRING(
-    uniform ivec2 Origin;
     uniform int ScreenWidth;
     uniform int ScreenHeight;
-    uniform int GlyphHeight;
+    uniform int AtlasWidth;
+    uniform int AtlasHeight;
 
-    in ivec2 PosData;  // x offset from the [Origin] and width of the glyph 
-    in vec2 TexCoords; // Texture x offsets (start and end)
+    in ivec4 GlyphData;  // x offset from the [Origin] and width of the glyph 
 
     out VertexData
     {
-        float GlyphWidthNDC;  // Glyph width in NDC
-        float GlyphHeightNDC; // Glyph height in NDC
+        float BitmapWidthNDC;  // Glyph width in NDC
+        float BitmapHeightNDC; // Glyph height in NDC
         float TexStart;
         float TexEnd;        
     } 
@@ -31,19 +30,20 @@
 
     void main()
     {
-        float posX = float(Origin.x + PosData.x)/ScreenWidth;
-        float posY = float(Origin.y)/ScreenHeight;
+        // compute position in NDC
+        float posX = float(GlyphData.x)/ScreenWidth;
+        float posY = float(GlyphData.y)/ScreenHeight;
 
         posX = 2.0f*posX - 1.0f;
         posY = 2.0f*posY - 1.0f;
 
-        VertexOut.TexStart = TexCoords.x;
-        VertexOut.TexEnd = TexCoords.y;
+        // compute texture coordinates
+        VertexOut.TexStart = float(GlyphData.w)/AtlasWidth;
+        VertexOut.TexEnd = float(GlyphData.w + GlyphData.z)/AtlasWidth;
 
-        VertexOut.GlyphWidthNDC = 2.0f*float(PosData.y)/ScreenWidth;
-        VertexOut.GlyphHeightNDC = 2.0f*float(GlyphHeight)/ScreenHeight;
-
-
+        // compute width and height of the bmp in NDC
+        VertexOut.BitmapWidthNDC = 2.0f*float(GlyphData.z)/ScreenWidth;
+        VertexOut.BitmapHeightNDC = 2.0f*float(AtlasHeight)/ScreenHeight;
 
         gl_Position = vec4(posX, posY, 0.0f, 1.0f);
     }
@@ -54,10 +54,10 @@
     TO_STRING(
     in VertexData
     {
-        float GlyphWidthNDC;  // Glyph width in NDC
-        float GlyphHeightNDC; // Glyph height in NDC
+        float BitmapWidthNDC;  // Glyph width in NDC
+        float BitmapHeightNDC; // Glyph height in NDC
         float TexStart;
-        float TexEnd;           
+        float TexEnd;        
     } 
     VertexIn[];
 
@@ -73,8 +73,8 @@
     void main()
     {
         vec4 pos = gl_in[0].gl_Position;
-        float w = VertexIn[0].GlyphWidthNDC;
-        float h = VertexIn[0].GlyphHeightNDC;
+        float w = VertexIn[0].BitmapWidthNDC;
+        float h = -VertexIn[0].BitmapHeightNDC;
         float ts = VertexIn[0].TexStart;
         float te = VertexIn[0].TexEnd;
 
@@ -114,6 +114,7 @@
     TO_STRING(
 
     uniform sampler2D Atlas;
+    uniform vec3 TextColor;
 
     in VertexData
     {
@@ -125,9 +126,10 @@
 
     void main()
     {
-        vec4 t = texture(Atlas, VertexIn.TexCoord);
+        float alpha = texture(Atlas, VertexIn.TexCoord).r;
+        vec3 textColor = alpha*TextColor;
 
-        FragOut = vec4(t.r, t.r, t.r, 1.0f);
+        FragOut = vec4(textColor, alpha);
     }
     );
 //------------------------------------------------------------------------------

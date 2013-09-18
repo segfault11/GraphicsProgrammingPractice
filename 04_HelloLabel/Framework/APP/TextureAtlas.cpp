@@ -37,8 +37,7 @@ APP::TextureAtlas::TextureAtlas(const std::string& font, unsigned int fontSize)
     FT_GlyphSlot g = face->glyph;
     int atlasWidth = 0;
     int atlasHeight = 0;
-    int blMin = 0;
-    int blMax = -1;
+
     
     // compute the dimensions of the atlas
     for (unsigned int i = 32; i < 128; i++) 
@@ -48,30 +47,20 @@ APP::TextureAtlas::TextureAtlas(const std::string& font, unsigned int fontSize)
             ERROR_WARNING("Loading character %c failed!")
             continue;
         }
-        
-        if (i == 32)
-        {
-            std::cout << g->bitmap.width << std::endl;
-            std::cout << g->bitmap_left << std::endl;
-        }
 
-        atlasWidth += (g->bitmap.width + (g->bitmap_left));
-        blMin = std::min(blMin, g->bitmap_top);
-
-        if (g->bitmap_top > 0)
-        {
-            blMin = std::min(blMin, g->bitmap_top - g->bitmap.rows);
-        }
-
-        blMax = std::max(blMax, g->bitmap_top);
-
+        atlasWidth += g->bitmap.width;
+        atlasHeight = std::max(atlasHeight, g->bitmap.rows);
     }
 
-    atlasHeight = blMax - blMin;
-
-    int baseline = 0 - blMin;
     unsigned char* atlas = new unsigned char[atlasWidth*atlasHeight];
+    
+    for (unsigned int i = 0; i < atlasHeight*atlasWidth; i++)
+    {
+        atlas[i] = 0;
+    }
+
     int marker = 0;
+
 
     for (unsigned int i = 32; i < 128; i++) 
     {
@@ -90,19 +79,22 @@ APP::TextureAtlas::TextureAtlas(const std::string& font, unsigned int fontSize)
         {
             for (unsigned int u = 0; u < w; u++)
             {
-                int y = atlasHeight - (baseline + g->bitmap_top) + v;
-                int x = marker + u  + (g->bitmap_left);
+                int y = atlasHeight - 1 - v;
+                int x = marker + u;
                 atlas[y*atlasWidth + x] = buffer[v*w + u];
             }
         }
 
         // save character info
-        charWidth_[i]  = w + (g->bitmap_left);
-        charOffset_[i] = marker;
+        bitmapWidth_[i]  = w;
+        atlasOffX_[i] = marker;
+        advances_[i] = Math::Vector2I(g->advance.x >> 6, g->advance.y >> 6);
+        bearings_[i] = Math::Vector2I(g->bitmap_left, g->bitmap_top);
 
         // increase marker
-        marker += (w + (g->bitmap_left));
+        marker += w;
     }
+
 
     // initialize member
     atlas_ = new GL::Tex2DR8FR8UI(
@@ -111,10 +103,9 @@ APP::TextureAtlas::TextureAtlas(const std::string& font, unsigned int fontSize)
             static_cast<void*>(atlas)
         );   
 
-    atlas_->SaveToBMP("test.bmp");
-
     width_ = atlasWidth;
     height_ = atlasHeight;
+
 
     // clean up
     delete[] atlas;
@@ -133,5 +124,7 @@ void APP::TextureAtlas::Bind(int i) const
 //------------------------------------------------------------------------------
 void APP::TextureAtlas::SaveToBMP(const std::string& filename) const
 {
-    atlas_->SaveToBMP(filename);
+    // Todo
 }
+//------------------------------------------------------------------------------
+

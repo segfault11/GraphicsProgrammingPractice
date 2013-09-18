@@ -9,6 +9,7 @@
 #include <string>
 #include "../Util.h"
 #include "../GL/Texture2D.h"
+#include "../Math/Vector2.h"
 
 namespace APP
 {
@@ -18,26 +19,39 @@ namespace APP
         TextureAtlas(const std::string& font, unsigned int fontSize);
         ~TextureAtlas();
 
-        int GetCharWidth(char c) const {return charWidth_[static_cast<int>(c)];}
-        int GetCharOffset(char c) const {return charOffset_[static_cast<int>(c)];}
+        
         int GetHeight() const {return height_;}
         int GetWidth() const {return width_;}
+        
+        int GetAtlasOffX(char c) const {return atlasOffX_[static_cast<int>(c)];}
+        int GetBitmapWidth(char c) const {return bitmapWidth_[static_cast<int>(c)];}
+        const Math::Vector2I& GetAdvance(char c) const {return advances_[static_cast<int>(c)];}
+        const Math::Vector2I& GetBearing(char c) const {return bearings_[static_cast<int>(c)];}
+
 
         /*!
         ** Binds the texture atlas to a texture unit.
         */
         void Bind(int i) const;
 
+
         void SaveToBMP(const std::string& filename) const;
+
+
 
     public:
         DECL_DEFAULTS(TextureAtlas)
 
         GL::Tex2DR8FR8UI* atlas_;
-        int charWidth_[128];
-        int charOffset_[128];
+
         int width_;
         int height_;
+        
+        int bitmapWidth_[128];
+        int atlasOffX_[128];
+        Math::Vector2I advances_[128];
+        Math::Vector2I bearings_[128];
+
     };
 }
  

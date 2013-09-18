@@ -9,6 +9,7 @@
 #include <string> 
 #include "../Util.h"
 #include "../Math/Vector2.h"
+#include "../Math/Vector3.h"
 
 namespace APP
 {
@@ -24,6 +25,8 @@ namespace APP
         GUIElement(const std::string& text, const Math::Vector2I& pos);
         ~GUIElement();
 
+
+        const Math::Vector3F& GetTextColor() const {return textColor_;}
         const Math::Vector2I& GetPosition() const {return position_;}
         const std::string& GetText() const {return text_;}
 
@@ -32,6 +35,7 @@ namespace APP
 
         std::string text_;
         Math::Vector2I position_;
+        Math::Vector3F textColor_;
     };
 }
  

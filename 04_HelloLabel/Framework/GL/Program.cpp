@@ -5,7 +5,7 @@
 #include "../Error/Error.h"
 
 //------------------------------------------------------------------------------
-//                            PUBLIC DEFININTIONS
+//                            PUBLIC DEFINITIONS
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -224,5 +224,17 @@ void GL::Program::SetIVec2(const char* name, const GLint* ivec)
     ERROR_ASSERT(loc != -1)
 
     glUniform2i(loc, ivec[0], ivec[1]);    
+}
+//------------------------------------------------------------------------------
+void GL::Program::SetVec3(const char* name, const GLfloat* vec)
+{
+    ERROR_ASSERT(compiled_)
+    
+    this->Bind();
+    GLint loc = glGetUniformLocation(program_, name);
+
+    ERROR_ASSERT(loc != -1)
+
+    glUniform3f(loc, vec[0], vec[1], vec[2]);    
 }
 //------------------------------------------------------------------------------

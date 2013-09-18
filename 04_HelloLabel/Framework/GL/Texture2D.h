@@ -32,7 +32,6 @@ namespace GL
         */
         void Bind(int unit) const;
     
-        void SaveToBMP(const std::string& filename) const;
 
     private:
         Texture2D();
