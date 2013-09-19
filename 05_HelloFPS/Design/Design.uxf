@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.1">
+  <zoom_level>11</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1144</x>
+      <y>374</y>
+      <w>209</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Application
+--
+--
++RegisterEventHandler()
++RegisterRenderer()
++RegisterGUIElement()
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>847</x>
+      <y>132</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+IEventHandler
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>836</x>
+      <y>429</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Camera
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>935</x>
+      <y>88</y>
+      <w>370</w>
+      <h>307</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+&lt;notifies
+m1=*
+</panel_attributes>
+    <additional_attributes>33;55;308;55;308;286</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>880</x>
+      <y>726</y>
+      <w>153</w>
+      <h>197</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+</panel_attributes>
+    <additional_attributes>33;176;132;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>814</x>
+      <y>902</y>
+      <w>198</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+MeshObject</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1122</x>
+      <y>440</y>
+      <w>142</w>
+      <h>307</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+bg=yellow</panel_attributes>
+    <additional_attributes>33;286;121;286;121;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>495</x>
+      <y>385</y>
+      <w>154</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>bt=*
+Object
+--
+--
++Update()
++IsActive():bool
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>528</x>
+      <y>110</y>
+      <w>340</w>
+      <h>296</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;</panel_attributes>
+    <additional_attributes>319;33;33;33;33;275</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>528</x>
+      <y>440</y>
+      <w>472</w>
+      <h>307</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;</panel_attributes>
+    <additional_attributes>451;286;33;286;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>979</x>
+      <y>682</y>
+      <w>176</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>bt=*
+IDrawable
+--
+--
++ Draw()
+
++ OnCameraUpdate()
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1342</x>
+      <y>902</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+TextureAtlas
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1133</x>
+      <y>891</y>
+      <w>230</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+bg=yellow</panel_attributes>
+    <additional_attributes>209;33;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1067</x>
+      <y>726</y>
+      <w>54</w>
+      <h>197</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+</panel_attributes>
+    <additional_attributes>33;176;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1045</x>
+      <y>902</y>
+      <w>121</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>bt=*
+GUIElement
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1133</x>
+      <y>682</y>
+      <w>131</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+bg=yellow</panel_attributes>
+    <additional_attributes>33;231;110;231;110;33</additional_attributes>
+  </element>
+</diagram>
