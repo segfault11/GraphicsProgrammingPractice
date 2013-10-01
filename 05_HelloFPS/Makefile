@@ -3,7 +3,7 @@ FLAGS = -Wall
 LIBS = -lGLEW libFramework.a -lfreetype libSOIL.a
 FRAMEWORKS = -framework OpenGL -framework SDL2 -framework CoreFoundation
 TARGET = HelloFPS
-OBJ = MeshRenderer.o
+OBJ = MeshRenderer.o FPSCounter.o
 
 .PHONY:
 $(TARGET): Main.cpp $(OBJ)
@@ -12,4 +12,4 @@ $(TARGET): Main.cpp $(OBJ)
 	rm libFramework.a
 
 %.o: %.cpp
-	$(CC) -c $< $(FLAGS)
+	$(CC) -g -c $< $(FLAGS)

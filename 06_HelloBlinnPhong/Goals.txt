@@ -1,0 +1,3 @@
+Goals
+ - Load and display "Sibenik.obj"
+ - Use Blinn Phong to shade geometry

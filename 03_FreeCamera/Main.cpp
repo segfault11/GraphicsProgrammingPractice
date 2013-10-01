@@ -1,10 +1,5 @@
 #include "Framework/SDL/Application.h"
-#include "Framework/OBJ/File.h"
-#include <iostream>
-#include "Framework/Math/Tuple.h"
 #include "MeshRenderer.h"
-#include "Framework/Math/Matrix4.h"
-#include "Framework/GL/Perspective.h"
 #include "CameraController.h"
 
 int main(int argc, char const *argv[])

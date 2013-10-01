@@ -9,14 +9,17 @@
 
 int main(int argc, char const *argv[])
 {
-    APP::Init("HelloLabel", 0, 0, 600, 600);
+    APP::Init("HelloLabel", 0, 0, 800, 600);
     APP::TextureAtlas atlas("Inconsolata.otf", 72);
     APP::GUIRenderer renderer(atlas);
     APP::GUIElement element1("Hallo, Welt", Math::Vector2I(50, 50));
     APP::GUIElement element2("Hello, WUUURLD!!?!", Math::Vector2I(100, 100));
+    APP::GUIElement element3("65daysofstatic", Math::Vector2I(25, 300));
     element2.SetTextColor(Math::Vector3F(0.0f, 0.0f, 1.0f));
+    element3.SetTextColor(Math::Vector3F(1.0f, 0.0f, 0.0f));
     renderer.RegisterGUIElement(element1);
     renderer.RegisterGUIElement(element2);
+    renderer.RegisterGUIElement(element3);
     APP::RegisterGUIRenderer(renderer);
     APP::Run();
     APP::Destroy();

@@ -7,6 +7,7 @@
 #define VERTEXBUFFER_H__
  
 #include <GL/GLEW.h>
+
 namespace GL
 {
     class BufferObject

@@ -1,10 +1,8 @@
 #include "Framework/APP/Application.h"
-#include "Framework/APP/TextureAtlas.h"
 #include "Framework/APP/GUIElement.h"
-#include "Framework/UI/UserInterface.h"
-#include "Framework/UI/Label.h"
 #include <iostream>
 #include "MeshRenderer.h"
+#include "FPSCounter.h"
 
 int main(int argc, char const *argv[])
 {
@@ -17,11 +15,9 @@ int main(int argc, char const *argv[])
     APP::SetCamera(cam);
     MeshRenderer mrenderer("Bunny.obj");
     APP::RegisterDrawable(mrenderer);
-    APP::TextureAtlas atlas("Inconsolata.otf", 42);
-    APP::GUIElement element("65", Math::Vector2I(700, 550), atlas);
-    APP::GUIElement element2("65", Math::Vector2I(200, 550), atlas);
+    APP::TextureAtlas atlas("Inconsolata.otf", 18);
+    FPSCounter element("", Math::Vector2I(700, 575), atlas);
     APP::RegisterGUIElement(element);
-    APP::RegisterGUIElement(element2);
     APP::Run();
     APP::Destroy();
     return 0;

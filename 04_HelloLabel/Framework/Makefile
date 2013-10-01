@@ -3,7 +3,7 @@ FLAGS = -Wall
 LIBS = 
 FRAMEWORKS = 
 TARGET = libFramework.a
-OBJ = GUIElement.o GUIRenderer.o TextureAtlas.o Label.o ICameraObserver.o IRenderer.o IObject.o IEventHandler.o Application.o File.o Mesh.o TmpMesh.o Program.o Shader.o BufferObject.o VertexArray.o Perspective.o Camera.o
+OBJ = BufferObject.o GUIElement.o GUIRenderer.o TextureAtlas.o Label.o ICameraObserver.o IRenderer.o IObject.o IEventHandler.o Application.o File.o Mesh.o TmpMesh.o Program.o Shader.o VertexArray.o Perspective.o Camera.o
 DOBJ = Error.o
 
 .PHONY:

@@ -97,19 +97,6 @@ m1=*
     <additional_attributes>33;55;308;55;308;198</additional_attributes>
   </element>
   <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>374</x>
-      <y>616</y>
-      <w>121</w>
-      <h>33</h>
-    </coordinates>
-    <panel_attributes>bt=*
-IRenderer
-bg=yellow</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>396</x>
@@ -193,14 +180,14 @@ Renderer</panel_attributes>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>396</x>
-      <y>616</y>
+      <y>638</y>
       <w>54</w>
-      <h>109</h>
+      <h>87</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;
 
 </panel_attributes>
-    <additional_attributes>33;88;33;33</additional_attributes>
+    <additional_attributes>33;66;33;33</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
@@ -252,5 +239,21 @@ bg=yellow</panel_attributes>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;</panel_attributes>
     <additional_attributes>308;231;33;231;33;33</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>374</x>
+      <y>616</y>
+      <w>121</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>bt=*
+IRenderer
+--
+--
++Render()
+bg=yellow</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>

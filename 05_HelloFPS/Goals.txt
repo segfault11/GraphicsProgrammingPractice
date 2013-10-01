@@ -1,4 +1,2 @@
 Goals
  - display fps
- - get constant FPS
- - check out SDL_VSYNC

@@ -135,6 +135,21 @@ void APP::Run()
             }    
         }
 
+        // update all objects
+        {
+        
+            std::list<IObject*>::iterator start = objects_.begin();
+            std::list<IObject*>::iterator end = objects_.end();
+
+            for (; start != end; start++)
+            {
+                (*start)->Update();
+            }
+
+        }
+
+
+
         //  draw gui renderer
         {
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -167,18 +182,6 @@ void APP::Run()
         }
         glDisable(GL_BLEND);
 
-        // update all objects
-        {
-        
-            std::list<IObject*>::iterator start = objects_.begin();
-            std::list<IObject*>::iterator end = objects_.end();
-
-            for (; start != end; start++)
-            {
-                (*start)->Update();
-            }
-
-        }
 
         SDL_GL_SwapWindow(window_);
     }
