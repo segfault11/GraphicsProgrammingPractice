@@ -3,14 +3,10 @@
 in vec2 Position;
 in vec3 Colors;
 
-out VertexShader
-{
-    vec3 Colors;
-}
-VertexShader;
+out vec3 Color;
 
 void main()
 {
-    VertexShader.Colors = Colors;
+    Color = Colors;
     gl_Position = vec4(Position, 0.0f, 1.0f);
 }

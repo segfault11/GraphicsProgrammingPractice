@@ -6,7 +6,11 @@
 #ifndef VERTEXARRAYOBJECT_H__
 #define VERTEXARRAYOBJECT_H__
 
-#include <GL/GLEW.h>
+#ifdef __APPLE__
+    #include <GL/GLEW.h> 
+#else 
+    #include <GL/glew.h>
+#endif
 #include "BufferObject.h"
 
 class VertexArray
