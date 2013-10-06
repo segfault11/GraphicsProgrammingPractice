@@ -1,6 +1,7 @@
 #include "MeshRenderer.h"
 #include <iostream>
 #include "Framework/APP/Application.h"
+
 //------------------------------------------------------------------------------
 //                           PUBLIC DEFINITIONS
 //------------------------------------------------------------------------------
@@ -43,7 +44,7 @@ void MeshRenderer::OnCameraUpdate()
 //------------------------------------------------------------------------------
 void MeshRenderer::setUpGLData(const std::string& filename)
 {
-    const Obj::File* f = Obj::Load(filename, NULL);
+    const Obj::File* f = Obj::Load(filename);
     
     // compute total number of faces
     unsigned int numFaces = 0;
@@ -98,7 +99,7 @@ void MeshRenderer::setUpGLData(const std::string& filename)
 
     // clean up
     delete[] pos;
-    Obj::ReleaseFile(&f);
+    Obj::Release(&f);
 
     // save # of vertices
     numVertices_ = 3*numFaces;
@@ -111,7 +112,7 @@ MeshRenderer::GLMesh::GLMesh(const std::string& filename)
     Normals(NULL),
     NumVertices(0)
 {
-    const Obj::File* f = Obj::Load(filename, NULL);
+    const Obj::File* f = Obj::Load(filename);
     
     // compute total number of faces
     unsigned int numFaces = 0;
@@ -159,7 +160,7 @@ MeshRenderer::GLMesh::GLMesh(const std::string& filename)
 
     // clean up
     delete[] pos;
-    Obj::ReleaseFile(&f);
+    Obj::Release(&f);
 
     // save # of vertices
     this->NumVertices = 3*numFaces;    

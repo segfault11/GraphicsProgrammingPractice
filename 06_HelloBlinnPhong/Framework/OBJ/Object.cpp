@@ -10,24 +10,47 @@
 //                         FILE PRIVATE DECLARATIONS
 //------------------------------------------------------------------------------
 static void readLine(std::string& line, std::ifstream& file);
-static void processLine(Obj::File& file, std::string& line);
+static void processLine(
+    Obj::File& file, 
+    unsigned int lineNo, 
+    std::string& line
+);
+static void processMatLine(
+    Obj::File& file, 
+    unsigned int lineNo, 
+    std::string& line
+);
 static bool addObject(Obj::File& file, std::string& line);
 static bool addGroup(Obj::File& file, std::string& line);
 static bool addPosition(Obj::File& file, std::string& line);
 static bool addNormal(Obj::File& file, std::string& line);
 static bool addTexCoord(Obj::File& file, std::string& line);
 static bool addFace(Obj::File& file, std::string& line);
+static bool readMaterialFile(Obj::File& file, std::string& line);
+static void reportError(
+    const std::string& filename,
+    unsigned int lineNumber, 
+    const std::string& line
+);
+
+static void (*errorHandler_)(
+    const std::string& filename,
+    unsigned int lineNumber, 
+    const std::string& line
+) = NULL;
+static std::string filename_;
+static std::string filenameMat_;
+
 //------------------------------------------------------------------------------
 //                           PUBLIC DEFINITIONS
 //------------------------------------------------------------------------------
 const Obj::File* Obj::Load(
-    const std::string& filename, 
-    void (*errorHandler)(const std::string& line, const std::string& errorMsg)
+    const std::string& filename
 )
 {
     std::ifstream file;
     std::string line;
-    
+    filename_ = filename;
 
     file.open(filename.c_str());
 
@@ -48,12 +71,16 @@ const Obj::File* Obj::Load(
     objFile->TexCoords.push_back(Math::Vector2F(0.0f, 0.0f));
     objFile->Normals.push_back(Math::Vector3F(0.0f, 0.0f, 0.0f));
 
+    // set the first material to be a default material
+    objFile->Materials.push_back(Material());
 
     // fill the struct
+    unsigned int lineNo = 1;
     while(file.good())
     {
         readLine(line, file);
-        processLine(*objFile, line);
+        processLine(*objFile, lineNo, line);
+        lineNo++;
     };
 
     file.close();
@@ -61,15 +88,33 @@ const Obj::File* Obj::Load(
     return objFile;
 }
 //------------------------------------------------------------------------------
-void Obj::ReleaseFile(const Obj::File** file)
+void Obj::Release(const Obj::File** file)
 {
     delete *file;
     *file = NULL;
 }
 //------------------------------------------------------------------------------
+void Obj::SetErrorHander(
+    void (*errorHandler)(
+        const std::string& filename,
+        unsigned int lineNumber, 
+        const std::string& line
+    )
+)
+{
+    errorHandler_ = errorHandler;
+}
+//------------------------------------------------------------------------------
 void Obj::Dump(const Obj::File* file)
 {
     std::cout << "Dumping: " << file->Name  << std::endl;
+    std::cout << "Materials" << std::endl;
+
+    for (unsigned int i = 0; i < file->Materials.size(); i++)
+    {
+        std::cout << file->Materials[i].ToString() << std::endl;
+    }
+
     std::cout << "# Objects " << file->Objects.size() << std::endl;
 
     for (unsigned int i = 0; i < file->Objects.size(); i++)
@@ -138,43 +183,50 @@ void readLine(std::string& line, std::ifstream& file)
     std::getline(file, line);
 }
 //------------------------------------------------------------------------------
-static void processLine(Obj::File& file, std::string& line)
+void processLine(Obj::File& file, unsigned int lineNo, std::string& line)
 {
+    #define CHECK_ERR(x) if (!x) {reportError(filename_, lineNo, line);}
     // TODO: maybe trim lines
+    if (line.find("mtllib") == 0)
+    {
+        CHECK_ERR(readMaterialFile(file, line))
+        return;
+    }
+
 
     if (line.c_str()[0] == 'o')
     {
-        addObject(file, line);
+        CHECK_ERR(addObject(file, line))
         return;
     }
 
     if (line.c_str()[0] == 'g')
     {
-        addGroup(file, line);
+        CHECK_ERR(addGroup(file, line))
         return;
     }
 
     if (line.c_str()[0] == 'v' && line.c_str()[1] == 'n')
     {
-        addNormal(file, line);
+        CHECK_ERR(addNormal(file, line))
         return;
     }
 
     if (line.c_str()[0] == 'v' && line.c_str()[1] == 't')
     {
-        addTexCoord(file, line);
+        CHECK_ERR(addTexCoord(file, line))
         return;
     }    
 
     if (line.c_str()[0] == 'v')
     {
-        addPosition(file, line);
+        CHECK_ERR(addPosition(file, line))
         return;
     }
 
     if (line.c_str()[0] == 'f')
     {
-        addFace(file, line);
+        CHECK_ERR(addFace(file, line))
         return;
     }
 
@@ -366,5 +418,164 @@ bool addGroup(Obj::File& file, std::string& line)
     file.Objects[file.Objects.size() - 1].Groups.push_back(g);
 
     return true;
+}
+//------------------------------------------------------------------------------
+static bool readMaterialFile(Obj::File& file, std::string& line)
+{
+    // READS IN A LINE FROM A MATERIAL FILE
+
+    char matFilename[MAX_NAME_LENGTH];
+    int n = std::sscanf(line.c_str(), "mtllib %s", matFilename);
+
+    if (n != 1)
+    {
+        return false;
+    }
+
+    filenameMat_ = matFilename;
+
+    std::ifstream matFile;
+    matFile.open(matFilename);
+
+    if (!matFile.is_open())
+    {
+        std::cout << "could not open mat file with filename: " << matFilename << std::endl;
+        return false;
+    }
+
+    std::string matLine;
+    unsigned int lineNo = 1;
+
+    while (matFile.good())
+    {
+        readLine(matLine, matFile);
+        processMatLine(file, lineNo, matLine);
+        lineNo++;
+    }
+
+    matFile.close();
+
+    return true;
+}
+//------------------------------------------------------------------------------
+void processMatLine(Obj::File& file, unsigned int lineNo, std::string& line)
+{
+    // TODO: trim string
+
+    if (line.find("newmtl") == 0)
+    {
+        // push back an empty material to the file
+        Obj::Material mat;
+        mat.Name = filenameMat_;
+        file.Materials.push_back(mat);
+    }
+
+    // fill the most recently add material
+    unsigned int cmi = file.Materials.size() - 1;
+
+    if (line.find("Ns") == 0)
+    {
+        float shininess;
+
+        if (1 != std::sscanf(line.c_str(), "Ns %f", &shininess))
+        {
+            reportError(filenameMat_, lineNo, line);
+            return;
+        }
+
+        file.Materials[cmi].Shininess = shininess;
+    }
+
+    if (line.find("Ni") == 0)
+    {
+        float refraction;
+
+        if (1 != std::sscanf(line.c_str(), "Ni %f", &refraction))
+        {
+            reportError(filenameMat_, lineNo, line);
+            return;
+        }
+
+        file.Materials[cmi].Refraction = refraction;
+        return;
+    }
+
+    if (line.find("Ka") == 0)
+    {
+        Math::Vector3F ambient;
+
+        int n = std::sscanf(
+                line.c_str(), 
+                "Ka %f %f %f",
+                &ambient[0],
+                &ambient[1],
+                &ambient[2] 
+            );
+
+        if (3 != n)
+        {
+            reportError(filenameMat_, lineNo, line);
+            return;
+        }
+
+        file.Materials[cmi].Ambient = ambient;
+        return;
+    }
+
+    if (line.find("Kd") == 0)
+    {
+        Math::Vector3F diffuse;
+
+        int n = std::sscanf(
+                line.c_str(), 
+                "Kd %f %f %f",
+                &diffuse[0],
+                &diffuse[1],
+                &diffuse[2] 
+            );
+
+        if (3 != n)
+        {
+            reportError(filenameMat_, lineNo, line);
+            return;
+        }
+
+        file.Materials[cmi].Diffuse = diffuse;
+        return;
+    }
+
+    if (line.find("Ks") == 0)
+    {
+        Math::Vector3F specular;
+
+        int n = std::sscanf(
+                line.c_str(), 
+                "Ks %f %f %f",
+                &specular[0],
+                &specular[1],
+                &specular[2] 
+            );
+
+        if (3 != n)
+        {
+            reportError(filenameMat_, lineNo, line);
+            return;
+        }
+
+        file.Materials[cmi].Specular = specular;
+        return;
+    }
+}
+//------------------------------------------------------------------------------
+static void reportError(
+    const std::string& filename,
+    unsigned int lineNumber, 
+    const std::string& line
+)
+{
+    if (errorHandler_ != NULL)
+    {
+        (*errorHandler_)(filename, lineNumber, line);
+    }
 }
 //------------------------------------------------------------------------------

@@ -8,15 +8,17 @@
 **   , if these do not exist in the .obj file the tex coords and normal  
 **   coordinates are set to null tuples and reference the null vectors in the
 **   [File]'s data arrays (see first remark).
-**    
+** - The first material in [Materials] of the [File] class is a default material
+**   for faces that were no material assigned to.
 ** @since 2013-09-27 
 */
 /*
     TODO's:
-        - Read Materials
+        - For Materials
+            - read textures (ambient, diffuse, specular, bump)
+            - read emission and transmission
         - Specify what materials should be supported
         - Triangulate Quads if they appear in the obj file.
-        - Implement "the error handling"
 */
 #ifndef OBJECT_H__
 #define OBJECT_H__
@@ -35,11 +37,40 @@ namespace Obj
     class Material
     {
     public:
+        Material()
+        :
+            Name(""), 
+            Ambient(Math::Vector3F(0.0f, 0.0f, 0.0f)),
+            Diffuse(Math::Vector3F(0.0f, 0.0f, 0.0f)),
+            Specular(Math::Vector3F(0.0f, 0.0f, 0.0f)),
+            Shininess(1.0f),
+            Refraction(0.0f)
+        {
+
+        }
+
+        std::string ToString() const
+        {
+            std::stringstream s;
+            s << "Name: " << Name << std::endl;
+            s << "Ambient Reflection:  " << Ambient.ToString() << std::endl;
+            s << "Diffuse Reflection:  " << Diffuse.ToString() << std::endl;
+            s << "Specular Reflection: " << Specular.ToString() << std::endl;
+            s << "Shininess:  " << Shininess << std::endl;
+            s << "Refraction: " << Refraction << std::endl;
+
+            return s.str();
+        }
+
+
         std::string Name;
 
-        Math::Vector3F Ka;
-        Math::Vector3F Kd;
-        Math::Vector3F Ks;
+        Math::Vector3F Ambient;
+        Math::Vector3F Diffuse;
+        Math::Vector3F Specular;
+
+        float Shininess;
+        float Refraction;
     };
 
     /*!
@@ -93,14 +124,14 @@ namespace Obj
     const File* Load(
         const std::string& filename
     );
-        
-    const File* Load(
-        const std::string& filename, 
-        void (*errorHandler)(const std::string& line, const std::string& errorMsg)
+    void Release(const File** file);
+    void SetErrorHander(
+        void (*errorHandler)(
+            const std::string& filename,
+            unsigned int lineNumber, 
+            const std::string& line
+        )
     );
-
-    void ReleaseFile(const File** file);
-
     void Dump(const File* file);
 
 }
