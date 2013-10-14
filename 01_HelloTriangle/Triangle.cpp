@@ -1,5 +1,9 @@
 #include "Triangle.h"
-#include <GL/GLEW.h>
+#ifdef __APPLE__
+    #include <GL/GLEW.h> 
+#else 
+    #include <GL/glew.h>
+#endif
 #include <iostream>
 
 Triangle::Triangle()

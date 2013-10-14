@@ -1,6 +1,12 @@
 #include "SDLApplication.h"
+#include <iostream>
 #include <stdexcept>
-#include <GL/GLEW.h>
+#include <cstdlib>
+#ifdef __APPLE__
+    #include <GL/GLEW.h> 
+#else 
+    #include <GL/glew.h>
+#endif
 
 // INITIALIZE STATIC MEMBER
 bool SDLApplication::initialized_ = false;
@@ -32,13 +38,13 @@ void SDLApplication::Init(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 24);
-    
+
     // create a new window  
     window_ = SDL_CreateWindow(
             "Hello Triangle", 
             0, 0, 
             width, height, 
-            SDL_WINDOW_SHOWN
+            SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN 
         );
 
     if (window_ == NULL)
@@ -57,6 +63,7 @@ void SDLApplication::Init(
         throw std::runtime_error(SDL_GetError());
     }
 
+
     // set up GLEW
     glewExperimental = GL_TRUE; 
 
@@ -68,7 +75,6 @@ void SDLApplication::Init(
     {
         printf("glewInit succeded\n");
     }
-
 
     initialized_ = true;
 }

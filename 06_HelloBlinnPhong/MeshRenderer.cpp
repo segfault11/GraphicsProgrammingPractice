@@ -3,184 +3,187 @@
 #include "Framework/APP/Application.h"
 
 //------------------------------------------------------------------------------
-//                           PUBLIC DEFINITIONS
+// DEFINITION OF THE GLSL PROGRAM
 //------------------------------------------------------------------------------
-MeshRenderer::MeshRenderer(const std::string& filename)
-:
-    APP::IDrawable(), mesh_(filename)
-{
-    program_.AttachShader("MeshVS.glsl", GL_VERTEX_SHADER);
-    program_.AttachShader("MeshFS.glsl", GL_FRAGMENT_SHADER);
-    program_.BindAttribLocation(0, "Position");
-    program_.BindFragDataLocation(0, "FragColor");
-    program_.Compile();
-    program_.SetMat4("V", APP::GetCamera().GetData());
-    program_.SetMat4("P", APP::GetCamera().GetPerspectiveData());
 
-    vertexArray_.SetAttribute(mesh_.Positions, 0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+class MeshProgram : public GL::Program
+{
+public:
+    MeshProgram();
+    ~MeshProgram();
+
+    void SetMaterial(const Obj::Material& mat);
+    void SetCamera(const APP::Camera& cam);
+};
+
+MeshProgram::MeshProgram()
+{
+    this->AttachShader("MeshVS.h", GL_VERTEX_SHADER);
+    this->AttachShader("MeshVS.h", GL_FRAGMENT_SHADER);
+    this->BindAttribLocation(0, "Position");
+    this->BindFragDataLocation(0, "FragColor");
+    this->Compile();
+}
+
+MeshProgram::~MeshProgram()
+{
+
+}
+
+void MeshProgram::SetMaterial(const Obj::Material& mat)
+{
+
+}
+
+void MeshProgram::SetCamera(const APP::Camera& cam)
+{
+
+}
+
+//------------------------------------------------------------------------------
+// DEFINITION OF A MATERIAL GROUP
+//------------------------------------------------------------------------------
+
+class MaterialGroup
+{
+    // MaterialGroup is a utility class that stores GL geometry for a certain
+    // material, and renders it given a GLSL program.
+public:
+    void SetMaterial(const Obj::Material& material);
+    void AddPosition(const Math::Vector3F& position);
+    void AddTexCoord(const Math::Vector2F& texCoord);
+    void AddNormal(const Math::Vector3F& normal);
+    void Upload();
+    void Draw();
+
+private:
+    std::vector<Math::Vector3F> positions;
+    std::vector<Math::Vector2F> texCoords;
+    std::vector<Math::Vector3F> normals;
+    Obj::Material material;
+};
+
+void MaterialGroup::SetMaterial(const Obj::Material& material)
+{
+    this->material = material;
+}
+
+void MaterialGroup::AddPosition(const Math::Vector3F& position)
+{
+    this->positions.push_back(position);
+}
+
+void MaterialGroup::AddTexCoord(const Math::Vector2F& texCoord)
+{
+    this->texCoords.push_back(texCoord);
+}
+
+void MaterialGroup::AddNormal(const Math::Vector3F& normal)
+{
+    this->AddNormal(normal);
 }
 //------------------------------------------------------------------------------
+//  DEFINITION OF THE IMPLEMENTATION CLASS
+//------------------------------------------------------------------------------
+
+class MeshRenderer::RealMeshRenderer
+{
+public:
+    RealMeshRenderer(const std::string& filename);
+    ~RealMeshRenderer();
+
+    void Draw();
+
+private:
+    // groups the .obj geometry into its material group
+    void group(const Obj::File& obj);
+
+    MaterialGroup* matGroups;
+    MeshProgram program;
+    unsigned int numMaterials;
+};
+
+MeshRenderer::RealMeshRenderer::RealMeshRenderer(const std::string& filename)
+{
+    // create the GLSL program
+
+
+    // load the .obj file
+    const Obj::File* file = Obj::Load(filename);
+    ERROR_ASSERT(file != NULL)
+
+    // group the geometry by their material
+    matGroups = new MaterialGroup[file->Materials.size()];
+
+
+
+    Obj::Release(&file);
+}
+
+MeshRenderer::RealMeshRenderer::~RealMeshRenderer()
+{
+    delete[] matGroups;
+}
+
+void MeshRenderer::RealMeshRenderer::group(const Obj::File& obj)
+{
+    // set the materials for each group
+    for (unsigned int i = 0; i < obj.Materials.size(); i++)
+    {
+        this->matGroups[i].SetMaterial(obj.Materials[i]);
+    }
+
+    for (unsigned int i = 0; obj.Objects.size(); i++)
+    {
+        for (unsigned int j = 0; obj.Objects[i].Groups.size(); j++)
+        {
+            for (unsigned int k = 0; obj.Objects[i].Groups[k].Faces.size(); k++)
+            {
+                const Obj::Face& f = obj.Objects[i].Groups[k].Faces[k];
+
+                // check the material index of the face
+                unsigned int matIdx = f.MaterialIndex;
+
+                // add geometry to the group
+                for (unsigned int u = 0; u < 3; u++)
+                {
+                    this->matGroups[matIdx].AddPosition(
+                        obj.Positions[f.PositionIndices[u]]
+                    );
+
+                    this->matGroups[matIdx].AddTexCoord(
+                        obj.TexCoords[f.TexCoordsIndices[u]]
+                    );
+
+                    this->matGroups[matIdx].AddNormal(
+                        obj.Normals[f.NormalIndices[u]]
+                    );
+                }
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// PUBLIC DEFINITIONS OF THE MESH RENDERER
+//------------------------------------------------------------------------------
+
+MeshRenderer::MeshRenderer(const std::string& filename)
+{
+    this->meshRenderer = new RealMeshRenderer(filename);
+}
+
 MeshRenderer::~MeshRenderer()
 {
-
+    delete this->meshRenderer;
 }
-//------------------------------------------------------------------------------
+
 void MeshRenderer::Draw()
 {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    program_.Bind();
-    vertexArray_.Bind();
-    glDrawArrays(GL_TRIANGLES, 0, mesh_.NumVertices);
+
 }
-//------------------------------------------------------------------------------
+
 void MeshRenderer::OnCameraUpdate()
 {
 
 }
-//------------------------------------------------------------------------------
-//                           PRIVATE DEFINITIONS
-//------------------------------------------------------------------------------
-void MeshRenderer::setUpGLData(const std::string& filename)
-{
-    const Obj::File* f = Obj::Load(filename);
-    
-    // compute total number of faces
-    unsigned int numFaces = 0;
-
-    for (unsigned int i = 0; i < f->Objects.size(); i++)
-    {
-        for (unsigned int j = 0; j < f->Objects[i].Groups.size(); j++)
-        {
-            numFaces += f->Objects[i].Groups[j].Faces.size();
-        }
-    }
-
-    // allocate space for positions
-    Math::Vector3F* pos = new Math::Vector3F[3*numFaces];
-
-    ERROR_ASSERT(pos != NULL)
-
-    // fill positions array from the .obj file
-    unsigned int c = 0;
-
-    for (unsigned int i = 0; i < f->Objects.size(); i++)
-    {
-        for (unsigned int j = 0; j < f->Objects[i].Groups.size(); j++)
-        {
-            for (unsigned int k = 0; k < f->Objects[i].Groups[j].Faces.size(); k++)
-            {
-                const Math::Tuple3UI& posIds = 
-                    f->Objects[i].Groups[j].Faces[k].PositionIndices;
-                
-                pos[c + 0] = f->Positions[posIds[0]];
-                pos[c + 1] = f->Positions[posIds[1]];
-                pos[c + 2] = f->Positions[posIds[2]];
-
-                c += 3;
-            }
-        }
-    }
-
-    // create GL buffer
-    this->buffer_ = new GL::BufferObject(
-            GL_ARRAY_BUFFER, 
-            sizeof(Math::Vector3F)*3*numFaces, 
-            GL_STATIC_DRAW
-        );
-    this->buffer_->SetData(
-        sizeof(Math::Vector3F)*3*numFaces, 
-        static_cast<const void*>(pos)
-    );
-
-    // set VAO
-    this->vertexArray_.SetAttribute(this->buffer_, 0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // clean up
-    delete[] pos;
-    Obj::Release(&f);
-
-    // save # of vertices
-    numVertices_ = 3*numFaces;
-}
-//------------------------------------------------------------------------------
-MeshRenderer::GLMesh::GLMesh(const std::string& filename)
-: 
-    Positions(NULL), 
-    TexCoords(NULL), 
-    Normals(NULL),
-    NumVertices(0)
-{
-    const Obj::File* f = Obj::Load(filename);
-    
-    // compute total number of faces
-    unsigned int numFaces = 0;
-
-    for (unsigned int i = 0; i < f->Objects.size(); i++)
-    {
-        for (unsigned int j = 0; j < f->Objects[i].Groups.size(); j++)
-        {
-            numFaces += f->Objects[i].Groups[j].Faces.size();
-        }
-    }
-
-    // allocate space for positions
-    Math::Vector3F* pos = new Math::Vector3F[3*numFaces];
-
-    ERROR_ASSERT(pos != NULL)
-
-    // fill positions array from the .obj file
-    unsigned int c = 0;
-
-    for (unsigned int i = 0; i < f->Objects.size(); i++)
-    {
-        for (unsigned int j = 0; j < f->Objects[i].Groups.size(); j++)
-        {
-            for (unsigned int k = 0; k < f->Objects[i].Groups[j].Faces.size(); k++)
-            {
-                const Math::Tuple3UI& posIds = 
-                    f->Objects[i].Groups[j].Faces[k].PositionIndices;
-                
-                pos[c + 0] = f->Positions[posIds[0]];
-                pos[c + 1] = f->Positions[posIds[1]];
-                pos[c + 2] = f->Positions[posIds[2]];
-
-                c += 3;
-            }
-        }
-    }
-
-    // create GL buffer
-    this->Positions = new GL::ArrayBufferSD(sizeof(Math::Vector3F)*3*numFaces);
-    this->Positions->SetData(
-        sizeof(Math::Vector3F)*3*numFaces, 
-        static_cast<const void*>(pos)
-    );
-
-    // clean up
-    delete[] pos;
-    Obj::Release(&f);
-
-    // save # of vertices
-    this->NumVertices = 3*numFaces;    
-}
-//------------------------------------------------------------------------------
-MeshRenderer::GLMesh::~GLMesh()
-{
-    if (this->Positions != NULL)
-    {
-        delete this->Positions;
-    }
-
-    if (this->TexCoords != NULL)
-    {
-        delete this->TexCoords;
-    }
-
-    if (this->Normals != NULL)
-    {
-        delete this->Normals;
-    }
-}
-//------------------------------------------------------------------------------

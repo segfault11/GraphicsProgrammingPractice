@@ -2,6 +2,7 @@
 
 uniform mat4 V;
 uniform mat4 P;
+uniform vec3 Ambient;
 
 in vec3 Position;
 

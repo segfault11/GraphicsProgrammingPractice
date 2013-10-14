@@ -120,11 +120,22 @@ namespace Obj
         std::vector<Object> Objects;
     };
 
-
-    const File* Load(
+    /*!
+    ** Loads an .obj file. Returns NULL if it fails.
+    */
+    File* Load(
         const std::string& filename
     );
+
+    /*!
+    ** Releases the .obj file. 
+    */
     void Release(const File** file);
+    
+    /*!
+    ** Sets an error handler that handles in the event a line cannot be 
+    ** interpreted.
+    */
     void SetErrorHander(
         void (*errorHandler)(
             const std::string& filename,
@@ -132,6 +143,10 @@ namespace Obj
             const std::string& line
         )
     );
+
+    /*!
+    ** Dumps the file to the console.
+    */
     void Dump(const File* file);
 
 }

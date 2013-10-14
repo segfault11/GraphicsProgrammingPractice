@@ -26,6 +26,7 @@ static bool addPosition(Obj::File& file, std::string& line);
 static bool addNormal(Obj::File& file, std::string& line);
 static bool addTexCoord(Obj::File& file, std::string& line);
 static bool addFace(Obj::File& file, std::string& line);
+static bool setCurrentMaterial(Obj::File& file, std::string& line);
 static bool readMaterialFile(Obj::File& file, std::string& line);
 static void reportError(
     const std::string& filename,
@@ -40,11 +41,12 @@ static void (*errorHandler_)(
 ) = NULL;
 static std::string filename_;
 static std::string filenameMat_;
+static unsigned int matIndex_;
 
 //------------------------------------------------------------------------------
 //                           PUBLIC DEFINITIONS
 //------------------------------------------------------------------------------
-const Obj::File* Obj::Load(
+Obj::File* Obj::Load(
     const std::string& filename
 )
 {
@@ -73,6 +75,9 @@ const Obj::File* Obj::Load(
 
     // set the first material to be a default material
     objFile->Materials.push_back(Material());
+
+    // set the current material index to 0 (the default index)
+    matIndex_ = 0;
 
     // fill the struct
     unsigned int lineNo = 1;
@@ -107,15 +112,21 @@ void Obj::SetErrorHander(
 //------------------------------------------------------------------------------
 void Obj::Dump(const Obj::File* file)
 {
-    std::cout << "Dumping: " << file->Name  << std::endl;
-    std::cout << "Materials" << std::endl;
+
+    std::cout << "+-------------------------------------------------------------------" << std::endl;
+    std::cout << "| Dumping: " << file->Name  << std::endl;
+    std::cout << "+-------------------------------------------------------------------\n" << std::endl;
+
+    std::cout << "Materials___________________________________________________________" << std::endl;
 
     for (unsigned int i = 0; i < file->Materials.size(); i++)
     {
         std::cout << file->Materials[i].ToString() << std::endl;
     }
 
-    std::cout << "# Objects " << file->Objects.size() << std::endl;
+
+    std::cout << "Objects______________________________________________________________" << std::endl;
+    std::cout << "Number of Objects " << file->Objects.size() << std::endl;
 
     for (unsigned int i = 0; i < file->Objects.size(); i++)
     {
@@ -126,7 +137,7 @@ void Obj::Dump(const Obj::File* file)
         {
             std::cout << "\n\t\tGroup " << j << std::endl;
             std::cout << "\t\tName: " << file->Objects[i].Groups[j].Name << std::endl;
-            std::cout << "\t\t# Faces: " << file->Objects[i].Groups[j].Faces.size() << std::endl;
+            std::cout << "\t\tFaceCount: " << file->Objects[i].Groups[j].Faces.size() << std::endl;
             std::cout << "\n\t\tFaces:" << std::endl;
 
             unsigned int numFaces = file->Objects[i].Groups[j].Faces.size();
@@ -142,37 +153,40 @@ void Obj::Dump(const Obj::File* file)
                     << p[0] << "/" << t[0] << "/" << n[0] << " "
                     << p[1] << "/" << t[1] << "/" << n[1] << " "
                     << p[2] << "/" << t[2] << "/" << n[2] << " "
+                    << "mat: " << f.MaterialIndex << " "
                     << std::endl;
             }
         }
     }
 
-    std::cout << "\n# Positions " << file->Positions.size() << std::endl;
-    std::cout << "\nPositions:" << std::endl;
+    std::cout << "\nPositions__________________________________________________________" << std::endl;
+    std::cout << "\nPositionCount " << file->Positions.size() << std::endl;
+;
 
     for (unsigned int i = 0; i < file->Positions.size(); i++)
     {
         const Math::Vector3F& pos = file->Positions[i];
-        std::cout << pos[0] << " " << pos[1] << " " << pos[2] << std::endl;
+        std::cout << "\t" << pos.ToString() << std::endl;
     }
 
-
-    std::cout << "\n# TexCoords " << file->TexCoords.size() << std::endl;
-    std::cout << "\nTexCoords:" << std::endl;
+    std::cout << "\nTexCoords__________________________________________________________" << std::endl;
+    std::cout << "\nTexCoordCount " << file->TexCoords.size() << std::endl;
+    
 
     for (unsigned int i = 0; i < file->TexCoords.size(); i++)
     {
         const Math::Vector2F& tc = file->TexCoords[i];
-        std::cout << tc[0] << " "<< tc[1] << std::endl;
+        std::cout << "\t" << tc.ToString() << std::endl;
     }
-    
-    std::cout << "\n# Normals " << file->Normals.size() << std::endl;
-    std::cout << "\nNormals:" << std::endl;
+
+    std::cout << "\nNormals____________________________________________________________" << std::endl;    
+    std::cout << "\nNormalCount " << file->Normals.size() << std::endl;
+
 
     for (unsigned int i = 0; i < file->Normals.size(); i++)
     {
         const Math::Vector3F& nrm = file->Normals[i];
-        std::cout << nrm[0] << " " << nrm[1] << " " << nrm[2] << std::endl;
+        std::cout << "\t" << nrm.ToString() << std::endl;
     }
 }
 //------------------------------------------------------------------------------
@@ -186,10 +200,18 @@ void readLine(std::string& line, std::ifstream& file)
 void processLine(Obj::File& file, unsigned int lineNo, std::string& line)
 {
     #define CHECK_ERR(x) if (!x) {reportError(filename_, lineNo, line);}
+    
     // TODO: maybe trim lines
+    
     if (line.find("mtllib") == 0)
     {
         CHECK_ERR(readMaterialFile(file, line))
+        return;
+    }
+
+    if (line.find("usemtl") == 0)
+    {
+        CHECK_ERR(setCurrentMaterial(file, line))
         return;
     }
 
@@ -296,7 +318,7 @@ bool addFace(Obj::File& file, std::string& line)
         file.Objects[file.Objects.size() - 1].Groups.push_back(g);
     }    
 
-    // scan line
+    // default init the face
     Obj::Face f;
 
     Math::Tuple3UI& posIds = f.PositionIndices;
@@ -309,6 +331,9 @@ bool addFace(Obj::File& file, std::string& line)
     nrmIds[1] = 0;
     nrmIds[2] = 0;
 
+    f.MaterialIndex = matIndex_;
+
+    // scan line
     unsigned int currObj = file.Objects.size() - 1;
     unsigned int currGrp = file.Objects[currObj].Groups.size() - 1;
 
@@ -420,6 +445,30 @@ bool addGroup(Obj::File& file, std::string& line)
     return true;
 }
 //------------------------------------------------------------------------------
+bool setCurrentMaterial(Obj::File& file, std::string& line)
+{
+    char matName[MAX_NAME_LENGTH];
+
+    if (1 != std::sscanf(line.c_str(), "usemtl %s", matName))
+    {
+        return false;
+    }
+    
+    // search for the material index that fits the name
+    for (unsigned int i = 0; i < file.Materials.size(); i++)
+    {
+        if (0 == file.Materials[i].Name.compare(std::string(matName)))
+        {
+            matIndex_ = i;
+            return true;
+        }
+    }
+
+    matIndex_ = 0;
+
+    return true;
+}
+//------------------------------------------------------------------------------
 static bool readMaterialFile(Obj::File& file, std::string& line)
 {
     // READS IN A LINE FROM A MATERIAL FILE
@@ -465,8 +514,15 @@ void processMatLine(Obj::File& file, unsigned int lineNo, std::string& line)
     if (line.find("newmtl") == 0)
     {
         // push back an empty material to the file
+        char matName[MAX_NAME_LENGTH];
+
+        if (1 != std::sscanf(line.c_str(), "newmtl %s", matName))
+        {
+            reportError(filenameMat_, lineNo, line);
+        }
+
         Obj::Material mat;
-        mat.Name = filenameMat_;
+        mat.Name = std::string(matName);
         file.Materials.push_back(mat);
     }
 

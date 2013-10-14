@@ -6,7 +6,11 @@
 #ifndef SHADER_H__
 #define SHADER_H__
  
-#include <GL/GLEW.h>
+#ifdef __APPLE__
+    #include <GL/GLEW.h> 
+#else 
+    #include <GL/glew.h>
+#endif
 
 class Shader
 {

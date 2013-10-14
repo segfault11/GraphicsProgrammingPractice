@@ -6,7 +6,11 @@
 #ifndef VERTEXBUFFER_H__
 #define VERTEXBUFFER_H__
  
-#include <GL/GLEW.h>
+#ifdef __APPLE__
+    #include <GL/GLEW.h> 
+#else 
+    #include <GL/glew.h>
+#endif
 
 class BufferObject
 {
